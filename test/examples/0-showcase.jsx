@@ -14,7 +14,7 @@ class ShowcaseLayout extends React.Component {
     className: "layout",
     rowHeight: 30,
     onLayoutChange: function() {},
-    cols: {lg: 12, md: 10, sm: 6, xs: 4, xxs: 2},
+    cols: {lg: 2, md: 10, sm: 6, xs: 4, xxs: 2},
     initialLayout: generateLayout()
   };
 
@@ -71,7 +71,9 @@ class ShowcaseLayout extends React.Component {
           measureBeforeMount={false}
           // I like to have it animate on mount. If you don't, delete `useCSSTransforms` (it's default `true`)
           // and set `measureBeforeMount={true}`.
-          useCSSTransforms={this.state.mounted}>
+          preventCollision={true}
+          verticalCompact={false}
+          useCSSTransforms={false}>
           {this.generateDOM()}
         </ResponsiveReactGridLayout>
       </div>
@@ -87,7 +89,7 @@ function generateLayout() {
     return {
       x: _.random(0, 5) * 2 % 12,
       y: Math.floor(i / 6) * y,
-      w: 2,
+      w: 1,
       h: y,
       i: i.toString(),
       static: Math.random() < 0.05

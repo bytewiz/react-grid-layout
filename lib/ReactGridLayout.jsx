@@ -49,7 +49,9 @@ export default class ReactGridLayout extends React.Component {
     draggableCancel: PropTypes.string,
     // A selector for the draggable handler
     draggableHandle: PropTypes.string,
-
+    // If true, grid items won't change position when being
+    // dragged over.
+    preventCollision: PropTypes.bool,
     // If true, the layout will compact vertically
     verticalCompact: PropTypes.bool,
 
@@ -243,7 +245,7 @@ export default class ReactGridLayout extends React.Component {
     };
 
     // Move the element to the dragged location.
-    layout = moveElement(layout, l, x, y, true /* isUserAction */);
+    layout = moveElement(layout, l, x, y, true, this.props.preventCollision);
 
     this.props.onDrag(layout, oldDragItem, l, placeholder, e, node);
 
@@ -268,7 +270,7 @@ export default class ReactGridLayout extends React.Component {
     if (!l) return;
 
     // Move the element here
-    layout = moveElement(layout, l, x, y, true /* isUserAction */);
+    layout = moveElement(layout, l, x, y, true, this.props.preventCollision);
 
     this.props.onDragStop(layout, oldDragItem, l, null, e, node);
 
@@ -443,7 +445,10 @@ export default class ReactGridLayout extends React.Component {
     };
 
     return (
-      <div className={classNames('react-grid-layout', className)} style={mergedStyle}>
+      <div
+        className={classNames('react-grid-layout', className)}
+        style={mergedStyle}
+      >
         {React.Children.map(this.props.children, (child) => this.processGridItem(child))}
         {this.placeholder()}
       </div>
