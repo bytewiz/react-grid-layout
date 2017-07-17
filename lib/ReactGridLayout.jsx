@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import isEqual from 'lodash.isequal';
 import classNames from 'classnames';
 import {autoBindHandlers, bottom, childrenEqual, cloneLayoutItem, compact, getLayoutItem, moveElement,
-  synchronizeLayoutWithChildren, validateLayout} from './utils';
+  synchronizeLayoutWithChildren, validateLayout, getFirstCollision} from './utils';
 import GridItem from './GridItem';
 const noop = function() {};
 
@@ -309,12 +309,21 @@ export default class ReactGridLayout extends React.Component {
 
   onResize(i:string, w:number, h:number, {e, node}: ResizeEvent) {
     const {layout, oldResizeItem} = this.state;
+    const { preventCollision } = this.props;
     var l = getLayoutItem(layout, i);
     if (!l) return;
 
     // Set new width and height.
+    const old = {w: l.w, h: l.h};
     l.w = w;
     l.h = h;
+
+    // Short circuit if there is a collision in no rearrangement mode.
+   if (preventCollision && getFirstCollision(layout, l)) {
+     l.w = old.w;
+     l.h = old.h;
+     return;
+   }
 
     // Create placeholder element (display only)
     var placeholder = {
@@ -448,6 +457,7 @@ export default class ReactGridLayout extends React.Component {
       <div
         className={classNames('react-grid-layout', className)}
         style={mergedStyle}
+        onMouseLeave={this.props.onMouseLeave}
       >
         {React.Children.map(this.props.children, (child) => this.processGridItem(child))}
         {this.placeholder()}
