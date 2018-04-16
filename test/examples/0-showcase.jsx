@@ -44,18 +44,16 @@ class ShowcaseLayout extends React.Component {
   }
 
   onMouseUp = (e) => {
-    // find coordinates to create item from
     const listOfCreate = Object.keys(this.state.create);
     const y = this.state.create[listOfCreate[0]].y;
     const x = this.state.create[listOfCreate[0]].x;
     const h = this.state.create[listOfCreate[listOfCreate.length - 1]].y - this.state.create[listOfCreate[0]].y;
-    this.setState({ mouseIsDown: false });
+    this.setState({ mouseIsDown: false, create: {} });
     this.props.onLayoutChange([...this.props.layout.filter(item => !this.state.create[item.i]), {i: `${x}${y}${h}b`, x: x, y: y, w: 1, h: h + 1 }], 'MOUSEUP');
   }
 
   generateDOM() {
-
-    return this.props.layout.map((l) => {
+    const layout = this.props.layout.map((l) => {
       const creatable = l.isDraggable === false;
       return (
         <div
@@ -70,10 +68,11 @@ class ShowcaseLayout extends React.Component {
               className={creatable ? "funky" : "text"}
               title="This item is static and cannot be removed or resized."
             />
-            : <span className={"text"} style={{textAlign: 'left'}}>0{l.y}:00</span>
+            : <span className={"text"} style={{textAlign: 'left'}}>0{l.y}:00 ({l.i})</span>
           }
         </div>);
     });
+    return layout;
   }
 
   onBreakpointChange = (breakpoint) => {
@@ -82,37 +81,30 @@ class ShowcaseLayout extends React.Component {
     });
   };
 
-  onLayoutChange = (layout, layouts) => {
-    this.props.onLayoutChange(layout, layouts);
-  };
+  addEmptyItems(e) {
+    this.props.onLayoutChange(e, 'ADD_STATIC');
+  }
+  addEmptyItems = this.addEmptyItems.bind(this);
 
-  onNewLayout = () => {
-    this.setState({
-      layouts: {lg: generateLayout()}
-    });
+  onLayoutChange = (layout) => {
+    this.props.onLayoutChange(layout);
   };
 
   render() {
     return (
-      <div>
-        <div>Current Breakpoint: {this.state.currentBreakpoint} ({this.props.cols[this.state.currentBreakpoint]} columns)
-        </div>
-        <button onClick={this.onNewLayout} style={{ marginBottom: '50px' }}>Generate New Layout</button>
+      <div style={{ marginTop: '50px' }}>
         <ResponsiveReactGridLayout
           {...this.props}
           layout={this.props.layout}
           onBreakpointChange={this.onBreakpointChange}
-          onLayoutChange={(e) => this.props.onLayoutChange(e, 'LOL')}
+          onLayoutChange={this.onLayoutChange}
           margin={[0, 0]}
           onMouseLeave={(e) => this.setState({ mouseIsDown: false, create: {} })}
-          // WidthProvider option
           measureBeforeMount={false}
-          // I like to have it animate on mount. If you don't, delete `useCSSTransforms` (it's default `true`)
-          // and set `measureBeforeMount={true}`.
-          onDragStart={(e) => this.props.onLayoutChange(e.filter(item => !(item.isDraggable === false)), 'DRAG START')}
-          onDragStop={(e) => {
-            this.props.onLayoutChange( [...this.props.layout, { x: 0, y: 7, w: 1, h: 1, i: 'a', isDraggable: false, isResizable: false }], 'DRAG STOP');
-          }}
+          onDragStart={(e) => this.props.onLayoutChange(e.filter(item => !(item.isDraggable === false)), 'DRAG_START')}
+          onResizeStart={(e) => this.props.onLayoutChange(e.filter(item => !(item.isDraggable === false)), 'RESIZE_START')}
+          onDragStop={this.addEmptyItems}
+          onResizeStop={this.addEmptyItems}
           preventCollision={true}
           verticalCompact={false}
           useCSSTransforms={false}
@@ -125,36 +117,6 @@ class ShowcaseLayout extends React.Component {
 }
 
 module.exports = ShowcaseLayout;
-
-// function fillLayout() {
-//   return [].concat.apply([], _.map(_.range(0, 2), (col) => {
-//     return _.map(_.range(0, 20), (item) => {
-//       return {
-//         x: col,
-//         y: item,
-//         w: 1,
-//         h: 1,
-//         isDraggable: false,
-//         isResizable: false,
-//         i: `${col}-${item}-bob`,
-//       };
-//     });
-//   }));
-// }
-
-function generateLayout() {
-  return _.map(_.range(0, 25), function (item, i) {
-    var y = Math.ceil(Math.random() * 4) + 1;
-    return {
-      x: _.random(0, 5) * 2 % 12,
-      y: Math.floor(i / 6) * y,
-      w: 1,
-      h: y,
-      i: i.toString(),
-      static: Math.random() < 0.05
-    };
-  });
-}
 
 if (require.main === module) {
   require('../test-hook.jsx')(module.exports);

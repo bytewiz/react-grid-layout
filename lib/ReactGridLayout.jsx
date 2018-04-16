@@ -189,9 +189,12 @@ export default class ReactGridLayout extends React.Component {
     // We need to regenerate the layout.
     if (newLayoutBase) {
       const newLayout = synchronizeLayoutWithChildren(newLayoutBase, nextProps.children,
-                                                      nextProps.cols, nextProps.verticalCompact);
-      const oldLayout = this.state.layout;
-      this.setState({layout: newLayout});
+        nextProps.cols, nextProps.verticalCompact);
+        const oldLayout = this.state.layout;
+        console.log('Props Updated', newLayout);
+      this.setState({
+        layout: newLayout
+      });
       this.onLayoutMaybeChanged(newLayout, oldLayout);
     }
   }
@@ -264,6 +267,7 @@ export default class ReactGridLayout extends React.Component {
    * @param {Element} node The current dragging DOM element
    */
   onDragStop(i:string, x:number, y:number, {e, node}: DragEvent) {
+    console.log('Drag Stop 12345');
     const {oldDragItem} = this.state;
     let {layout} = this.state;
     const l = getLayoutItem(layout, i);
@@ -277,13 +281,12 @@ export default class ReactGridLayout extends React.Component {
     // Set state
     const newLayout = compact(layout, this.props.verticalCompact);
     const {oldLayout} = this.state;
-    this.setState({
-      activeDrag: null,
-      layout: newLayout,
-      oldDragItem: null,
-      oldLayout: null,
-    });
-
+    // this.setState({
+    //   activeDrag: null,
+    //   layout: newLayout,
+    //   oldDragItem: null,
+    //   oldLayout: null,
+    // });
     this.onLayoutMaybeChanged(newLayout, oldLayout);
   }
 
@@ -447,19 +450,19 @@ export default class ReactGridLayout extends React.Component {
 
   render() {
     const {className, style} = this.props;
-
     const mergedStyle = {
       height: this.containerHeight(),
       ...style
     };
-
     return (
       <div
         className={classNames('react-grid-layout', className)}
         style={mergedStyle}
         onMouseLeave={this.props.onMouseLeave}
       >
-        {React.Children.map(this.props.children, (child) => this.processGridItem(child))}
+        {React.Children.map(this.props.children, (child) => {
+          return this.processGridItem(child);
+        })}
         {this.placeholder()}
       </div>
     );
