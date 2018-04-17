@@ -8,14 +8,13 @@ const initLayout = [
   { x: 0, y: 0, w: 1, h: 1, i: '1' },
   { x: 1, y: 0, w: 1, h: 1, i: '2' },
   { x: 1, y: 7, w: 1, h: 1, i: '3' },
-  { x: 1, y: 30, w: 1, h: 1, i: '-'},
 ];
 
 module.exports = function(Layout) {
   class ExampleLayout extends React.Component {
 
     state = {
-      cols: 2,
+      cols: 5,
       maxRows: 30,
       layout: [],
     };

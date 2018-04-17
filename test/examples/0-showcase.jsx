@@ -199,9 +199,10 @@ class ShowcaseLayout extends React.Component {
 
   render() {
     return (
-      <div style={{ marginTop: '50px' }}>
+      <div style={{ marginTop: '50px', background: 'red' }}>
         <ResponsiveReactGridLayout
           {...this.props}
+          staticHeight={true}
           layout={this.props.layout}
           onBreakpointChange={this.onBreakpointChange}
           onLayoutChange={this.onLayoutChange}

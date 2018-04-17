@@ -147,7 +147,8 @@ export default class ReactGridLayout extends React.Component {
     onDragStop: noop,
     onResizeStart: noop,
     onResize: noop,
-    onResizeStop: noop
+    onResizeStop: noop,
+    staticHeight: false,
   };
 
   state: State = {
@@ -204,9 +205,12 @@ export default class ReactGridLayout extends React.Component {
    */
   containerHeight() {
     if (!this.props.autoSize) return;
+    if (this.props.staticHeight) {
+      return (this.props.rowHeight * this.props.maxRows) + 'px';
+    }
     const nbRow = bottom(this.state.layout);
     const containerPaddingY = this.props.containerPadding ? this.props.containerPadding[1] : this.props.margin[1];
-    return (nbRow * this.props.rowHeight + (nbRow - 1) * this.props.margin[1] + containerPaddingY * 2 - 30) + 'px';
+    return (nbRow * this.props.rowHeight + (nbRow - 1) * this.props.margin[1] + containerPaddingY * 2) + 'px';
   }
 
   /**
