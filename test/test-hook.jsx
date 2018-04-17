@@ -63,25 +63,10 @@ module.exports = function(Layout) {
         }
       }
     };
-
-    stringifyLayout() {
-      return this.state.layout.map(function(l) {
-        return <div className="layoutItem" key={l.i}><b>{l.i}</b>: [{l.x}, {l.y}, {l.w}, {l.h}]</div>;
-      });
-    }
-
+    
     render(){
       return (
         <div>
-          {/* <div
-            className="layoutJSON"
-            style={{ minHeight: '40px' }}
-          >
-            Displayed as <code>[x, y, w, h]</code>:
-            <div className="columns">
-              {this.stringifyLayout()}
-            </div>
-          </div> */}
           <Layout
             layout={this.state.layout}
             onLayoutChange={this.onLayoutChange}

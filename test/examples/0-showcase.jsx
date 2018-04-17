@@ -25,30 +25,96 @@ class ShowcaseLayout extends React.Component {
     currentBreakpoint: 'lg',
     mounted: false,
     layouts: {lg: this.props.initialLayout},
-    create: {}
+    create: {},
+    startPoint: null,
+    endPoint: null,
+    reservedPoints: [],
   };
 
   componentDidMount() {
     this.setState({mounted: true});
   }
 
+  getReservedGrid(grids, col) {
+    const reservedArray = [];
+    grids.forEach((grid) => {
+      if (grid.isDraggable !== false) {
+        for (let column = grid.x; column < (grid.x + grid.w); column++) {
+          if(column === col) {
+            for (let row = grid.y; row < (grid.y + grid.h); row++) {
+              reservedArray.push(row);
+            }
+          }
+        }
+      }
+    });
+    return reservedArray;
+  }
+
+  filterPoints(items, endPoint, flag) {
+    const listOfCreate = Object.keys(items);
+    console.log(listOfCreate);
+    if(flag) {
+      listOfCreate.forEach((item) => {
+        if (parseInt(item.split('-')[2]) > endPoint.y) {
+          delete items[item];
+        }
+      });
+    }
+    console.log(items);
+    return items;
+  }
+
+  isOverLapped(item, flag) {
+    let overLappedFlag = false;
+    if(flag) {
+      overLappedFlag = this.state.reservedPoints.filter((y) => {
+        if(this.state.startPoint.y < y && item.y >= y) {
+          return y;
+        }
+      });
+    }
+    if(overLappedFlag.length > 0) {
+      return false;
+    }
+    return true;
+  }
+
   onMouseEnter = (e, item) => {
     const listOfCreate = Object.keys(this.state.create);
-    if(this.state.mouseIsDown && item.y > this.state.create[listOfCreate[listOfCreate.length - 1]].y) {
-      this.setState({ create: { ...this.state.create, [item.i]: item }});
+    if (this.state.mouseIsDown &&
+      (item.y > this.state.create[listOfCreate[listOfCreate.length - 1]].y || item.y < this.state.create[listOfCreate[listOfCreate.length - 1]].y)
+    ) {
+      if(this.state.endPoint.y >= this.state.startPoint.y) {
+        if (this.isOverLapped(item, true)) {
+          const create = this.filterPoints(this.state.create, item, true);
+          console.log(create);
+          this.setState({
+            endPoint: item,
+            create: { ...create, [item.i]: item },
+          });
+        }
+      }
     }
   }
 
   onMouseDown = (e, current) => {
-    this.setState({ create: {[current.i]: current}, mouseIsDown: true });
+    this.setState({
+      create: {[current.i]: current},
+      startPoint: current,
+      endPoint: current,
+      mouseIsDown: true,
+      reservedPoints: this.getReservedGrid(this.props.layout, current.x),
+    });
   }
 
   onMouseUp = (e) => {
     const listOfCreate = Object.keys(this.state.create);
+    console.log(this.state);
     const y = this.state.create[listOfCreate[0]].y;
     const x = this.state.create[listOfCreate[0]].x;
     const h = this.state.create[listOfCreate[listOfCreate.length - 1]].y - this.state.create[listOfCreate[0]].y;
-    this.setState({ mouseIsDown: false, create: {} });
+    this.setState({ mouseIsDown: false, create: {}, startPoint: null, endPoint: null });
     this.props.onLayoutChange([...this.props.layout.filter(item => !this.state.create[item.i]), {i: `${x}${y}${h}b`, x: x, y: y, w: 1, h: h + 1 }], 'MOUSEUP');
   }
 
