@@ -5,10 +5,10 @@ require('style-loader!css-loader!../examples/example-styles.css');
 typeof window !== "undefined" && (window.React = React); // for devtools
 
 const initLayout = [
-  { x: 0, y: 0, w: 1, h: 1, i: 'u' },
-  { x: 1, y: 0, w: 1, h: 1, i: 'lol' },
-  { x: 1, y: 7, w: 1, h: 1, i: 'john6' },
-  { x: 1, y: 30, w: 1, h: 1, i: 'Footer' },
+  { x: 0, y: 0, w: 1, h: 1, i: '1' },
+  { x: 1, y: 0, w: 1, h: 1, i: '2' },
+  { x: 1, y: 7, w: 1, h: 1, i: '3' },
+  { x: 1, y: 30, w: 1, h: 1, i: '-'},
 ];
 
 module.exports = function(Layout) {
@@ -50,7 +50,7 @@ module.exports = function(Layout) {
                 h: 1,
                 i: `item-${column}-${row}`,
                 isDraggable: false,
-                isResizable: false
+                isResizable: false,
               });
             }
           }
@@ -63,7 +63,7 @@ module.exports = function(Layout) {
         }
       }
     };
-    
+
     render(){
       return (
         <div>

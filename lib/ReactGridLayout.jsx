@@ -191,7 +191,6 @@ export default class ReactGridLayout extends React.Component {
       const newLayout = synchronizeLayoutWithChildren(newLayoutBase, nextProps.children,
         nextProps.cols, nextProps.verticalCompact);
         const oldLayout = this.state.layout;
-        console.log('Props Updated', newLayout);
       this.setState({
         layout: newLayout
       });
@@ -207,7 +206,7 @@ export default class ReactGridLayout extends React.Component {
     if (!this.props.autoSize) return;
     const nbRow = bottom(this.state.layout);
     const containerPaddingY = this.props.containerPadding ? this.props.containerPadding[1] : this.props.margin[1];
-    return nbRow * this.props.rowHeight + (nbRow - 1) * this.props.margin[1] + containerPaddingY * 2 + 'px';
+    return (nbRow * this.props.rowHeight + (nbRow - 1) * this.props.margin[1] + containerPaddingY * 2 - 30) + 'px';
   }
 
   /**
@@ -267,7 +266,6 @@ export default class ReactGridLayout extends React.Component {
    * @param {Element} node The current dragging DOM element
    */
   onDragStop(i:string, x:number, y:number, {e, node}: DragEvent) {
-    console.log('Drag Stop 12345');
     const {oldDragItem} = this.state;
     let {layout} = this.state;
     const l = getLayoutItem(layout, i);
@@ -281,12 +279,12 @@ export default class ReactGridLayout extends React.Component {
     // Set state
     const newLayout = compact(layout, this.props.verticalCompact);
     const {oldLayout} = this.state;
-    // this.setState({
-    //   activeDrag: null,
-    //   layout: newLayout,
-    //   oldDragItem: null,
-    //   oldLayout: null,
-    // });
+    this.setState({
+      activeDrag: null,
+      layout: newLayout,
+      oldDragItem: null,
+      oldLayout: null,
+    });
     this.onLayoutMaybeChanged(newLayout, oldLayout);
   }
 

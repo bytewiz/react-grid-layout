@@ -51,25 +51,42 @@ class ShowcaseLayout extends React.Component {
     return reservedArray;
   }
 
-  filterPoints(items, endPoint, flag) {
-    const listOfCreate = Object.keys(items);
-    console.log(listOfCreate);
+  // flag parameter set to true if start point > end point
+  generatePoints(startPoint, endPoint, flag) {
+    const items = {};
     if(flag) {
-      listOfCreate.forEach((item) => {
-        if (parseInt(item.split('-')[2]) > endPoint.y) {
-          delete items[item];
-        }
-      });
+      for (let index = startPoint.y; index <= endPoint.y; index++) {
+        items[`item-${startPoint.x}-${index}`] = {
+          w: 1,
+          h: 1,
+          x: startPoint.x,
+          y: index,
+        };
+      }
+    } else {
+      for (let index = endPoint.y; index <= startPoint.y; index++) {
+        items[`item-${startPoint.x}-${index}`] = {
+          w: 1,
+          h: 1,
+          x: startPoint.x,
+          y: index,
+        };
+      }
     }
-    console.log(items);
     return items;
   }
-
+  // flag parameter set to true if start point > end point
   isOverLapped(item, flag) {
     let overLappedFlag = false;
     if(flag) {
       overLappedFlag = this.state.reservedPoints.filter((y) => {
         if(this.state.startPoint.y < y && item.y >= y) {
+          return y;
+        }
+      });
+    } else {
+      overLappedFlag = this.state.reservedPoints.filter((y) => {
+        if (this.state.startPoint.y > y && item.y <= y) {
           return y;
         }
       });
@@ -81,17 +98,21 @@ class ShowcaseLayout extends React.Component {
   }
 
   onMouseEnter = (e, item) => {
-    const listOfCreate = Object.keys(this.state.create);
-    if (this.state.mouseIsDown &&
-      (item.y > this.state.create[listOfCreate[listOfCreate.length - 1]].y || item.y < this.state.create[listOfCreate[listOfCreate.length - 1]].y)
-    ) {
-      if(this.state.endPoint.y >= this.state.startPoint.y) {
-        if (this.isOverLapped(item, true)) {
-          const create = this.filterPoints(this.state.create, item, true);
-          console.log(create);
+    if (this.state.mouseIsDown) {
+      if (item.y < this.state.startPoint.y) {
+        if (this.isOverLapped(item, false)) {
+          const create = this.generatePoints(this.state.startPoint, item, false);
           this.setState({
             endPoint: item,
-            create: { ...create, [item.i]: item },
+            create,
+          });
+        }
+      } else if (item.y >= this.state.startPoint.y) {
+        if (this.isOverLapped(item, true)) {
+          const create = this.generatePoints(this.state.startPoint, item, true);
+          this.setState({
+            endPoint: item,
+            create,
           });
         }
       }
@@ -108,38 +129,50 @@ class ShowcaseLayout extends React.Component {
     });
   }
 
-  onMouseUp = (e) => {
-    const listOfCreate = Object.keys(this.state.create);
-    console.log(this.state);
-    const y = this.state.create[listOfCreate[0]].y;
-    const x = this.state.create[listOfCreate[0]].x;
-    const h = this.state.create[listOfCreate[listOfCreate.length - 1]].y - this.state.create[listOfCreate[0]].y;
-    this.setState({ mouseIsDown: false, create: {}, startPoint: null, endPoint: null });
-    this.props.onLayoutChange([...this.props.layout.filter(item => !this.state.create[item.i]), {i: `${x}${y}${h}b`, x: x, y: y, w: 1, h: h + 1 }], 'MOUSEUP');
+  onMouseUp() {
+    if (this.state.mouseIsDown) {
+      const listOfCreate = Object.keys(this.state.create);
+      const x = this.state.create[listOfCreate[0]].x;
+      let y = this.state.create[listOfCreate[0]].y;
+      let h = this.state.create[listOfCreate[listOfCreate.length - 1]].y - this.state.create[listOfCreate[0]].y;
+      if (h < 0) {
+        y = this.state.create[listOfCreate[listOfCreate.length - 1]].y;
+        h = Math.abs(h);
+      }
+      this.setState({ mouseIsDown: false, create: {}, startPoint: null, endPoint: null });
+      this.props.onLayoutChange([...this.props.layout.filter(item => !this.state.create[item.i]), {i: `${x}${y}${h}b`, x: x, y: y, w: 1, h: h + 1 }], 'MOUSEUP');
+    }
   }
+  onMouseUp = this.onMouseUp.bind(this);
 
   generateDOM() {
     const layout = this.props.layout.map((l) => {
       const creatable = l.isDraggable === false;
+      const footer = l.gridType === "footer";
       return (
         <div
           key={l.i}
-          className={creatable ? this.state.create[l.i] ? 'marked' : 'static' : ''}
-          onMouseUp={(e) => creatable && this.onMouseUp(e)}
+          className={creatable ? (this.state.create[l.i] ? 'marked' : 'static') : ''}
+          onMouseUp={this.onMouseUp}
           onMouseDown={(e) => creatable && this.onMouseDown(e, l)}
           onMouseEnter={(e) => creatable && this.onMouseEnter(e, l)}
+          // style={footer ? {display: 'none'} : {}}
         >
-          {creatable ?
-            <span
-              className={creatable ? "funky" : "text"}
-              title="This item is static and cannot be removed or resized."
-            />
-            : <span className={"text"} style={{textAlign: 'left'}}>0{l.y}:00 ({l.i})</span>
-          }
-        </div>);
+          <div onMouseUp={this.onMouseUp} style={{ height: '100%' }}>
+            {creatable ?
+              <span
+                className={creatable ? "funky" : "text"}
+                title="This item is static and cannot be removed or resized."
+              />
+              : <span className={"text"} style={{textAlign: 'left'}}>0{l.y}:00 ({l.i})</span>
+            }
+          </div>
+        </div>
+      );
     });
     return layout;
   }
+  generateDOM = this.generateDOM.bind(this);
 
   onBreakpointChange = (breakpoint) => {
     this.setState({
@@ -147,14 +180,22 @@ class ShowcaseLayout extends React.Component {
     });
   };
 
-  addEmptyItems(e) {
-    this.props.onLayoutChange(e, 'ADD_STATIC');
+  startEvent(e) {
+    this.props.onLayoutChange(e.filter(item => !(item.isDraggable === false)), 'START_EVENT');
   }
-  addEmptyItems = this.addEmptyItems.bind(this);
+  startEvent = this.startEvent.bind(this);
 
-  onLayoutChange = (layout) => {
+  stopEvent(e) {
+    setTimeout(() => {
+      this.props.onLayoutChange(e, 'ADD_STATIC');
+    }, 100);
+  }
+  stopEvent = this.stopEvent.bind(this);
+
+  onLayoutChange(layout) {
     this.props.onLayoutChange(layout);
-  };
+  }
+  onLayoutChange = this.onLayoutChange.bind(this);
 
   render() {
     return (
@@ -167,10 +208,10 @@ class ShowcaseLayout extends React.Component {
           margin={[0, 0]}
           onMouseLeave={(e) => this.setState({ mouseIsDown: false, create: {} })}
           measureBeforeMount={false}
-          onDragStart={(e) => this.props.onLayoutChange(e.filter(item => !(item.isDraggable === false)), 'DRAG_START')}
-          onResizeStart={(e) => this.props.onLayoutChange(e.filter(item => !(item.isDraggable === false)), 'RESIZE_START')}
-          onDragStop={this.addEmptyItems}
-          onResizeStop={this.addEmptyItems}
+          onDragStart={this.startEvent}
+          onResizeStart={this.startEvent}
+          onDragStop={this.stopEvent}
+          onResizeStop={this.stopEvent}
           preventCollision={true}
           verticalCompact={false}
           useCSSTransforms={false}
