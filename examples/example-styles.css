@@ -108,3 +108,45 @@ li b {
   font-size: 19px;
   line-height: 14px;
 }
+
+.grid-container {
+  display: inline-block;
+  width: calc(100% - 80px);
+}
+.time-container {
+  display: inline-block;
+  width: 80px;
+  vertical-align: top;
+}
+.time-container ul {
+  margin: 0px;
+  padding: 0px;
+}
+.time-container li {
+  list-style-type: none;
+  font-size: 24px;
+  text-align: right;
+  padding-right: 15px;
+}
+.grid-timeZone {
+  display: inline-block;
+  width: 80px;
+  text-align: center;
+}
+.track-container {
+  display: inline-block;
+  width: calc(100% - 80px);
+}
+.track-container ul {
+  padding: 0px;
+  margin: 0px;
+}
+.track-container li {
+  list-style-type: none;
+  font-size: 24px;
+  display: inline-block;
+}
+.grid-header {
+  margin-top: 50px;
+  margin-bottom: 15px;
+}

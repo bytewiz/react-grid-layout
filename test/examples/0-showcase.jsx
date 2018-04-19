@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 import _ from 'lodash';
 import ReactGridLayout, {WidthProvider} from 'react-grid-layout';
 const ResponsiveReactGridLayout = WidthProvider(ReactGridLayout);
@@ -149,6 +150,8 @@ class ShowcaseLayout extends React.Component {
     const layout = this.props.layout.map((l) => {
       const creatable = l.isDraggable === false;
       const footer = l.gridType === "footer";
+      const startTime = moment(this.props.startTime).add((l.y * this.props.gridDuration), 'minutes').format('HH:mm');
+      const endTime = moment(this.props.startTime).add(((l.y + l.h) * this.props.gridDuration), 'minutes').format('HH:mm');
       return (
         <div
           key={l.i}
@@ -156,7 +159,6 @@ class ShowcaseLayout extends React.Component {
           onMouseUp={this.onMouseUp}
           onMouseDown={(e) => creatable && this.onMouseDown(e, l)}
           onMouseEnter={(e) => creatable && this.onMouseEnter(e, l)}
-          // style={footer ? {display: 'none'} : {}}
         >
           <div onMouseUp={this.onMouseUp} style={{ height: '100%' }}>
             {creatable ?
@@ -164,7 +166,7 @@ class ShowcaseLayout extends React.Component {
                 className={creatable ? "funky" : "text"}
                 title="This item is static and cannot be removed or resized."
               />
-              : <span className={"text"} style={{textAlign: 'left'}}>0{l.y}:00 ({l.i})</span>
+              : <div className={"text"} style={{textAlign: 'left'}}>{startTime} - {endTime}<text> ({l.i})</text></div>
             }
           </div>
         </div>
@@ -197,28 +199,83 @@ class ShowcaseLayout extends React.Component {
   }
   onLayoutChange = this.onLayoutChange.bind(this);
 
-  render() {
+  renderTime() {
+    const startTime = moment(this.props.startTime);
+    const endTime = moment(this.props.endTime);
+    const difference = startTime.diff(endTime, 'hours');
+    const timeHeight = this.props.rowHeight * (60 / this.props.gridDuration);
+    const time = [<li style={{ height: timeHeight }}>{startTime.format('HH:mm')}</li>];
+    for (var i = 0; i < (Math.abs(difference) - 1); i++) {
+      time.push(
+        <li style={{ height: timeHeight }}>{startTime.add(1, 'hour').format('HH:mm')}</li>
+      );
+    }
     return (
-      <div style={{ marginTop: '50px', background: 'red' }}>
-        <ResponsiveReactGridLayout
-          {...this.props}
-          staticHeight={true}
-          layout={this.props.layout}
-          onBreakpointChange={this.onBreakpointChange}
-          onLayoutChange={this.onLayoutChange}
-          margin={[0, 0]}
-          onMouseLeave={(e) => this.setState({ mouseIsDown: false, create: {} })}
-          measureBeforeMount={false}
-          onDragStart={this.startEvent}
-          onResizeStart={this.startEvent}
-          onDragStop={this.stopEvent}
-          onResizeStop={this.stopEvent}
-          preventCollision={true}
-          verticalCompact={false}
-          useCSSTransforms={false}
-        >
-          {this.generateDOM()}
-        </ResponsiveReactGridLayout>
+      <div className="time-container">
+        <ul>
+          {time}
+        </ul>
+      </div>
+    )
+  }
+  renderTime = this.renderTime.bind(this);
+  
+  renderTracks() {
+    return (
+      <div className="track-container">
+        <ul>
+          {
+            this.props.currentTracks.map((track) => {
+              const currentTrack = this.props.tracks.find((t) => t._id === track);
+              return (
+                <li style={{ width: `${100/this.props.currentTracks.length}%`}}>
+                  {currentTrack.title}
+                </li>
+              )
+            })
+          }
+        </ul>
+      </div>
+    )
+  }
+  renderTime = this.renderTime.bind(this);
+
+  render() {
+    // console.log(this.props.layout);
+    return (
+      <div>
+        <div className="grid-header">
+          <div className="grid-timeZone">GMT +5</div>
+          {
+            this.renderTracks()
+          }
+        </div>
+        <div>  
+          {
+            this.renderTime()
+          }
+          <div className="grid-container">
+            <ResponsiveReactGridLayout
+              {...this.props}
+              staticHeight={true}
+              layout={this.props.layout}
+              onBreakpointChange={this.onBreakpointChange}
+              onLayoutChange={this.onLayoutChange}
+              margin={[0, 0]}
+              onMouseLeave={(e) => this.setState({ mouseIsDown: false, create: {} })}
+              measureBeforeMount={false}
+              onDragStart={this.startEvent}
+              onResizeStart={this.startEvent}
+              onDragStop={this.stopEvent}
+              onResizeStop={this.stopEvent}
+              preventCollision={true}
+              verticalCompact={false}
+              useCSSTransforms={false}
+            >
+              {this.generateDOM()}
+            </ResponsiveReactGridLayout>
+          </div>
+        </div>
       </div>
     );
   }
