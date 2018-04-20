@@ -187,8 +187,9 @@ class ShowcaseLayout extends React.Component {
   }
   startEvent = this.startEvent.bind(this);
 
-  stopEvent(e) {
+  stopEvent(e, item, newItem) {
     setTimeout(() => {
+      this.props.onItemUpdate(newItem);
       this.props.onLayoutChange(e, 'ADD_STATIC');
     }, 100);
   }
@@ -230,15 +231,16 @@ class ShowcaseLayout extends React.Component {
               return (
                 <li style={{ width: `${100/this.props.currentTracks.length}%`}}>
                   {currentTrack.title}
+                  <button onClick={() => {this.props.deleteTrack(currentTrack._id)}}>Delete</button>
                 </li>
               )
             })
           }
         </ul>
       </div>
-    )
+    );
   }
-  renderTime = this.renderTime.bind(this);
+  renderTracks = this.renderTracks.bind(this);
 
   render() {
     // console.log(this.props.layout);

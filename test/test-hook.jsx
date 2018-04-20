@@ -201,23 +201,12 @@ module.exports = function(Layout) {
       maxRows: 30,
       rowHeight: 30,
       gridDuration: 5,
+      currentSplit: 0,
       layout: [],
     };
 
     componentWillMount() {
-      this.getSplitInfo(0);
-    }
-
-    getReservedGrid(grids) {
-      const reservedArray = [];
-      grids.forEach((grid) => {
-        for (let column = grid.x; column < (grid.x + grid.w); column++) {
-          for (let row = grid.y; row < (grid.y + grid.h); row++) {
-            reservedArray.push(`${column}-${row}`);
-          }
-        }
-      });
-      return reservedArray;
+      this.getSplitInfo(this.state.currentSplit);
     }
 
     onLayoutChange = (layout, type) => {
@@ -247,6 +236,27 @@ module.exports = function(Layout) {
         }
       }
     };
+
+    onItemUpdate(item) {
+      const startTime = item.y * this.state.gridDuration;
+      const endTime = (item.y + item.h) * this.state.gridDuration;
+      const currentSplit = backendData.splits[this.state.currentSplit];
+      console.log(moment(currentSplit.start).add(startTime, 'minutes').format('HH:mm'));
+      console.log(moment(currentSplit.start).add(endTime, 'minutes').format('HH:mm'));
+    }
+    onItemUpdate = this.onItemUpdate.bind(this);
+
+    getReservedGrid(grids) {
+      const reservedArray = [];
+      grids.forEach((grid) => {
+        for (let column = grid.x; column < (grid.x + grid.w); column++) {
+          for (let row = grid.y; row < (grid.y + grid.h); row++) {
+            reservedArray.push(`${column}-${row}`);
+          }
+        }
+      });
+      return reservedArray;
+    }
 
     getLayout(tracks, tasks, split) {
       const layout = [];
@@ -299,20 +309,17 @@ module.exports = function(Layout) {
     }
     addTrack = this.addTrack.bind(this);
 
-    removeTrack() {
-      this.setState({
-        cols: this.state.cols - 1,
-      }, () => {
-        this.onLayoutChange(this.state.layout, 'ADD_STATIC');
-      });
+    deleteTrack(id) {
+      const index = backendData.splits[this.state.currentSplit].tracks.indexOf(id);
+      backendData.splits[this.state.currentSplit].tracks.splice(index, 1);
+      this.getSplitInfo(this.state.currentSplit);
     }
-    removeTrack = this.removeTrack.bind(this);
+    deleteTrack = this.deleteTrack.bind(this);
 
     render(){
       return (
         <div>
           <button onClick={this.addTrack}>Add Track</button>
-          <button onClick={this.removeTrack}>Remove Track</button>
           <Layout
             layout={this.state.layout}
             onLayoutChange={this.onLayoutChange}
@@ -324,6 +331,8 @@ module.exports = function(Layout) {
             endTime={this.state.endTime}
             currentTracks={this.state.currentTracks}
             tracks={this.state.tracks}
+            deleteTrack={this.deleteTrack}
+            onItemUpdate={this.onItemUpdate}
           />
         </div>
       );
