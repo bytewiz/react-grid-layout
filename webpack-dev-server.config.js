@@ -3,7 +3,7 @@ var webpack = require("webpack");
 
 module.exports = {
     context: __dirname,
-    entry: "./test/dev-hook.jsx",
+    entry: "./src/container.jsx",
     output: {
         path: '/',
         filename: "bundle.js",

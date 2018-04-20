@@ -284,7 +284,3 @@ class ShowcaseLayout extends React.Component {
 }
 
 module.exports = ShowcaseLayout;
-
-if (require.main === module) {
-  require('../test-hook.jsx')(module.exports);
-}
