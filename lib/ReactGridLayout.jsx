@@ -147,7 +147,8 @@ export default class ReactGridLayout extends React.Component {
     onDragStop: noop,
     onResizeStart: noop,
     onResize: noop,
-    onResizeStop: noop
+    onResizeStop: noop,
+    staticHeight: false,
   };
 
   state: State = {
@@ -189,9 +190,11 @@ export default class ReactGridLayout extends React.Component {
     // We need to regenerate the layout.
     if (newLayoutBase) {
       const newLayout = synchronizeLayoutWithChildren(newLayoutBase, nextProps.children,
-                                                      nextProps.cols, nextProps.verticalCompact);
-      const oldLayout = this.state.layout;
-      this.setState({layout: newLayout});
+        nextProps.cols, nextProps.verticalCompact);
+        const oldLayout = this.state.layout;
+      this.setState({
+        layout: newLayout
+      });
       this.onLayoutMaybeChanged(newLayout, oldLayout);
     }
   }
@@ -202,9 +205,12 @@ export default class ReactGridLayout extends React.Component {
    */
   containerHeight() {
     if (!this.props.autoSize) return;
+    if (this.props.staticHeight) {
+      return (this.props.rowHeight * this.props.maxRows) + 'px';
+    }
     const nbRow = bottom(this.state.layout);
     const containerPaddingY = this.props.containerPadding ? this.props.containerPadding[1] : this.props.margin[1];
-    return nbRow * this.props.rowHeight + (nbRow - 1) * this.props.margin[1] + containerPaddingY * 2 + 'px';
+    return (nbRow * this.props.rowHeight + (nbRow - 1) * this.props.margin[1] + containerPaddingY * 2) + 'px';
   }
 
   /**
@@ -283,7 +289,6 @@ export default class ReactGridLayout extends React.Component {
       oldDragItem: null,
       oldLayout: null,
     });
-
     this.onLayoutMaybeChanged(newLayout, oldLayout);
   }
 
@@ -447,19 +452,19 @@ export default class ReactGridLayout extends React.Component {
 
   render() {
     const {className, style} = this.props;
-
     const mergedStyle = {
       height: this.containerHeight(),
       ...style
     };
-
     return (
       <div
         className={classNames('react-grid-layout', className)}
         style={mergedStyle}
         onMouseLeave={this.props.onMouseLeave}
       >
-        {React.Children.map(this.props.children, (child) => this.processGridItem(child))}
+        {React.Children.map(this.props.children, (child) => {
+          return this.processGridItem(child);
+        })}
         {this.placeholder()}
       </div>
     );
