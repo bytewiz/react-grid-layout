@@ -63,6 +63,18 @@ body {
     #ccc 20px
   );
 }
+.react-grid-item.static .creatable .time {
+  display: none;
+}
+.react-grid-item.marked .creatable .time {
+  display: none;
+}
+.react-grid-item.static:hover .creatable .time {
+  display: block;
+}
+.react-grid-item.marked:hover .creatable .time {
+  display: block;
+}
 .react-grid-item.marked {
   border:none;
   box-shadow: none;

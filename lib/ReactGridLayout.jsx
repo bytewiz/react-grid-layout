@@ -1,15 +1,13 @@
 // @flow
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import isEqual from 'lodash.isequal';
-import classNames from 'classnames';
 import {autoBindHandlers, bottom, childrenEqual, cloneLayoutItem, compact, getLayoutItem, moveElement,
   synchronizeLayoutWithChildren, validateLayout, getFirstCollision} from './utils';
 import GridItem from './GridItem';
-const noop = function() {};
+import type {ResizeEvent, DragEvent, Layout, LayoutItem} from './utils';
 
 // Types
-import type {ResizeEvent, DragEvent, Layout, LayoutItem} from './utils';
 type State = {
   activeDrag: ?LayoutItem,
   layout: Layout,
@@ -24,110 +22,9 @@ type State = {
  * A reactive, fluid grid layout with draggable, resizable components.
  */
 
-export default class ReactGridLayout extends React.Component {
+export default class ReactGridLayout extends Component {
   // TODO publish internal ReactClass displayName transform
   static displayName = "ReactGridLayout";
-
-  static propTypes = {
-    //
-    // Basic props
-    //
-    className: PropTypes.string,
-    style: PropTypes.object,
-
-    // This can be set explicitly. If it is not set, it will automatically
-    // be set to the container width. Note that resizes will *not* cause this to adjust.
-    // If you need that behavior, use WidthProvider.
-    width: PropTypes.number,
-
-    // If true, the container height swells and contracts to fit contents
-    autoSize: PropTypes.bool,
-    // # of cols.
-    cols: PropTypes.number,
-
-    // A selector that will not be draggable.
-    draggableCancel: PropTypes.string,
-    // A selector for the draggable handler
-    draggableHandle: PropTypes.string,
-    // If true, grid items won't change position when being
-    // dragged over.
-    preventCollision: PropTypes.bool,
-    // If true, the layout will compact vertically
-    verticalCompact: PropTypes.bool,
-
-    // layout is an array of object with the format:
-    // {x: Number, y: Number, w: Number, h: Number, i: String}
-    layout: function (props) {
-      var layout = props.layout;
-      // I hope you're setting the data-grid property on the grid items
-      if (layout === undefined) return;
-      validateLayout(layout, 'layout');
-    },
-
-    //
-    // Grid Dimensions
-    //
-
-    // Margin between items [x, y] in px
-    margin: PropTypes.arrayOf(PropTypes.number),
-    // Padding inside the container [x, y] in px
-    containerPadding: PropTypes.arrayOf(PropTypes.number),
-    // Rows have a static height, but you can change this based on breakpoints if you like
-    rowHeight: PropTypes.number,
-    // Default Infinity, but you can specify a max here if you like.
-    // Note that this isn't fully fleshed out and won't error if you specify a layout that
-    // extends beyond the row capacity. It will, however, not allow users to drag/resize
-    // an item past the barrier. They can push items beyond the barrier, though.
-    // Intentionally not documented for this reason.
-    maxRows: PropTypes.number,
-
-    //
-    // Flags
-    //
-    isDraggable: PropTypes.bool,
-    isResizable: PropTypes.bool,
-    // Use CSS transforms instead of top/left
-    useCSSTransforms: PropTypes.bool,
-
-    //
-    // Callbacks
-    //
-
-    // Callback so you can save the layout. Calls after each drag & resize stops.
-    onLayoutChange: PropTypes.func,
-
-    // Calls when drag starts. Callback is of the signature (layout, oldItem, newItem, placeholder, e).
-    // All callbacks below have the same signature. 'start' and 'stop' callbacks omit the 'placeholder'.
-    onDragStart: PropTypes.func,
-    // Calls on each drag movement.
-    onDrag: PropTypes.func,
-    // Calls when drag is complete.
-    onDragStop: PropTypes.func,
-    //Calls when resize starts.
-    onResizeStart: PropTypes.func,
-    // Calls when resize movement happens.
-    onResize: PropTypes.func,
-    // Calls when resize is complete.
-    onResizeStop: PropTypes.func,
-
-    //
-    // Other validations
-    //
-
-    // Children must not have duplicate keys.
-    children: function (props, propName, _componentName) {
-      var children = props[propName];
-
-      // Check children keys for duplicates. Throw if found.
-      var keys = {};
-      React.Children.forEach(children, function (child) {
-        if (keys[child.key]) {
-          throw new Error("Duplicate child key found! This will cause problems in ReactGridLayout.");
-        }
-        keys[child.key] = true;
-      });
-    }
-  };
 
   static defaultProps = {
     autoSize: true,
@@ -141,13 +38,13 @@ export default class ReactGridLayout extends React.Component {
     isResizable: true,
     useCSSTransforms: true,
     verticalCompact: true,
-    onLayoutChange: noop,
-    onDragStart: noop,
-    onDrag: noop,
-    onDragStop: noop,
-    onResizeStart: noop,
-    onResize: noop,
-    onResizeStop: noop,
+    onLayoutChange: () => {},
+    onDragStart: () => {},
+    onDrag: () => {},
+    onDragStop: () => {},
+    onResizeStart: () => {},
+    onResize: () => {},
+    onResizeStop: () => {},
     staticHeight: false,
   };
 
@@ -458,7 +355,7 @@ export default class ReactGridLayout extends React.Component {
     };
     return (
       <div
-        className={classNames('react-grid-layout', className)}
+        className={'react-grid-layout'}
         style={mergedStyle}
         onMouseLeave={this.props.onMouseLeave}
       >
