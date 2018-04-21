@@ -13,7 +13,6 @@ class ShowcaseLayout extends React.Component {
     cols: 2,
     maxRows: 30,
     initialLayout: [],
-    mouseIsDown: false,
     create: {},
   };
 
@@ -24,6 +23,7 @@ class ShowcaseLayout extends React.Component {
     create: {},
     startPoint: null,
     endPoint: null,
+    mouseIsDown: false, 
     reservedPoints: [],
   };
 
@@ -162,7 +162,7 @@ class ShowcaseLayout extends React.Component {
                 title="This item is static and cannot be removed or resized."
               >
                 <div class="time">
-                  {startTime} - {endTime}
+                  {this.state.mouseIsDown ? endTime : startTime }
                 </div>
               </div>
               : <div className={"text"} style={{textAlign: 'left'}}>{startTime} - {endTime}<text> ({l.i})</text></div>
