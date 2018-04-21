@@ -65,9 +65,11 @@ body {
 }
 .react-grid-item.static .creatable .time {
   display: none;
+  opacity: 0.5;
 }
 .react-grid-item.marked .creatable .time {
   display: none;
+  opacity: 0.5;
 }
 .react-grid-item.static:hover .creatable .time {
   display: block;
