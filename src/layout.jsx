@@ -1,15 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
 import _ from 'lodash';
 import ReactGridLayout, {WidthProvider} from 'react-grid-layout';
 const ResponsiveReactGridLayout = WidthProvider(ReactGridLayout);
 
 class ShowcaseLayout extends React.Component {
-
-  static propTypes = {
-    onLayoutChange: PropTypes.func.isRequired
-  };
 
   static defaultProps = {
     className: "layout",
@@ -162,10 +157,14 @@ class ShowcaseLayout extends React.Component {
         >
           <div onMouseUp={this.onMouseUp} style={{ height: '100%' }}>
             {creatable ?
-              <span
-                className={creatable ? "funky" : "text"}
+              <div
+                className={creatable ? "creatable" : "text"}
                 title="This item is static and cannot be removed or resized."
-              />
+              >
+                <div class="time">
+                  {startTime} - {endTime}
+                </div>
+              </div>
               : <div className={"text"} style={{textAlign: 'left'}}>{startTime} - {endTime}<text> ({l.i})</text></div>
             }
           </div>
@@ -243,7 +242,6 @@ class ShowcaseLayout extends React.Component {
   renderTracks = this.renderTracks.bind(this);
 
   render() {
-    // console.log(this.props.layout);
     return (
       <div>
         <div className="grid-header">

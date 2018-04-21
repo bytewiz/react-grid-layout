@@ -56,7 +56,7 @@ export const backendData = {
             "_id": "tracks/2297005",
             "_key": "2297005",
             "color": "colors/2296993",
-            "title": "Stage 4"
+            "title": "Stage 1"
         },
         {
             "_id": "tracks/2",
@@ -109,7 +109,7 @@ export const backendData = {
             "finish": "2018-04-20T08:00:52.000Z",
             "rooms": [],
             "start": "2018-04-20T07:15:52.000Z",
-            "title": "Task 2345",
+            "title": "Task 2",
             "tracks": [
                 "tracks/2297155"
             ],

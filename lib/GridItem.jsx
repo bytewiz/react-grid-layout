@@ -1,11 +1,9 @@
 // @flow
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 import {DraggableCore} from 'react-draggable';
 import {Resizable} from 'react-resizable';
 import {perc, setTopLeft, setTransform} from './utils';
 import classNames from 'classnames';
-
 import type {DragCallbackData, Position} from './utils';
 
 type State = {
@@ -14,80 +12,7 @@ type State = {
   className: string
 };
 
-/**
- * An individual item within a ReactGridLayout.
- */
-export default class GridItem extends React.Component {
-
-  static propTypes = {
-    // Children must be only a single element
-    children: PropTypes.element,
-
-    // General grid attributes
-    cols: PropTypes.number.isRequired,
-    containerWidth: PropTypes.number.isRequired,
-    rowHeight: PropTypes.number.isRequired,
-    margin: PropTypes.array.isRequired,
-    maxRows: PropTypes.number.isRequired,
-    containerPadding: PropTypes.array.isRequired,
-
-    // These are all in grid units
-    x: PropTypes.number.isRequired,
-    y: PropTypes.number.isRequired,
-    w: PropTypes.number.isRequired,
-    h: PropTypes.number.isRequired,
-
-    // All optional
-    minW: function (props, propName) {
-      const value = props[propName];
-      if (typeof value !== 'number') return new Error('minWidth not Number');
-      if (value > props.w || value > props.maxW) return new Error('minWidth larger than item width/maxWidth');
-    },
-
-    maxW: function (props, propName) {
-      const value = props[propName];
-      if (typeof value !== 'number') return new Error('maxWidth not Number');
-      if (value < props.w || value < props.minW) return new Error('maxWidth smaller than item width/minWidth');
-    },
-
-    minH: function (props, propName) {
-      const value = props[propName];
-      if (typeof value !== 'number') return new Error('minHeight not Number');
-      if (value > props.h || value > props.maxH) return new Error('minHeight larger than item height/maxHeight');
-    },
-
-    maxH: function (props, propName) {
-      const value = props[propName];
-      if (typeof value !== 'number') return new Error('maxHeight not Number');
-      if (value < props.h || value < props.minH) return new Error('maxHeight smaller than item height/minHeight');
-    },
-
-    // ID is nice to have for callbacks
-    i: PropTypes.string.isRequired,
-
-    // Functions
-    onDragStop: PropTypes.func,
-    onDragStart: PropTypes.func,
-    onDrag: PropTypes.func,
-    onResizeStop: PropTypes.func,
-    onResizeStart: PropTypes.func,
-    onResize: PropTypes.func,
-
-    // Flags
-    isDraggable: PropTypes.bool.isRequired,
-    isResizable: PropTypes.bool.isRequired,
-    static: PropTypes.bool,
-
-    // Use CSS transforms instead of top/left
-    useCSSTransforms: PropTypes.bool.isRequired,
-
-    // Others
-    className: PropTypes.string,
-    // Selector for draggable handle
-    handle: PropTypes.string,
-    // Selector for draggable cancel (see react-draggable)
-    cancel: PropTypes.string
-  };
+export default class GridItem extends Component {
 
   static defaultProps = {
     className: '',
@@ -354,9 +279,8 @@ export default class GridItem extends React.Component {
     };
   }
 
-  render(): React.Element<any> {
+  render() {
     const {x, y, w, h, isDraggable, isResizable, useCSSTransforms} = this.props;
-
     const pos = this.calcPosition(x, y, w, h, this.state);
     const child = React.Children.only(this.props.children);
 
