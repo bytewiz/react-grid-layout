@@ -29,7 +29,6 @@ export default class ReactGridLayout extends Component {
   static defaultProps = {
     autoSize: true,
     cols: 12,
-    className: '',
     rowHeight: 150,
     maxRows: Infinity, // infinite vertical growth
     layout: [],
@@ -348,7 +347,7 @@ export default class ReactGridLayout extends Component {
   }
 
   render() {
-    const {className, style} = this.props;
+    const {style} = this.props;
     const mergedStyle = {
       height: this.containerHeight(),
       ...style
