@@ -63,20 +63,26 @@ body {
     #ccc 20px
   );
 }
-.react-grid-item.static .creatable .time {
+.react-grid-item .creatable .time {
   display: none;
   opacity: 0.5;
+  height: 100%;
 }
-.react-grid-item.marked .creatable .time {
+.react-grid-item:hover .creatable .time {
+  display: block;
+}
+
+.react-grid-item .creatable .default-grid {
   display: none;
-  opacity: 0.5;
+  background: #4cce3d;
+  color: #ffffff;
+  opacity: 1;
+  height: 100%;
 }
-.react-grid-item.static:hover .creatable .time {
+.react-grid-item:hover .creatable .default-grid {
   display: block;
 }
-.react-grid-item.marked:hover .creatable .time {
-  display: block;
-}
+
 .react-grid-item.marked {
   border:none;
   box-shadow: none;

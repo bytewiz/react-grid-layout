@@ -55,8 +55,6 @@ class GridContainer extends Component {
     const startTime = item.y * this.state.gridDuration;
     const endTime = (item.y + item.h) * this.state.gridDuration;
     const currentSplit = backendData.splits[this.state.currentSplit];
-    console.log(moment(currentSplit.start).add(startTime, 'minutes').format('HH:mm'));
-    console.log(moment(currentSplit.start).add(endTime, 'minutes').format('HH:mm'));
   }
   onItemUpdate = this.onItemUpdate.bind(this);
 
@@ -130,6 +128,11 @@ class GridContainer extends Component {
   }
   deleteTrack = this.deleteTrack.bind(this);
 
+  openDrawer(id) {
+    console.log(id);
+  }
+  openDrawer = this.openDrawer.bind(this);
+
   render(){
     return (
       <div>
@@ -147,6 +150,7 @@ class GridContainer extends Component {
           tracks={this.state.tracks}
           deleteTrack={this.deleteTrack}
           onItemUpdate={this.onItemUpdate}
+          openDrawer={this.openDrawer}
         />
       </div>
     );
